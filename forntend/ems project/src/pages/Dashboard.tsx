@@ -1,8 +1,8 @@
 import ViewPageComponents from "@/components/Reuseable_components/view-page-components"
 
-const DashboardPage = () => {
+const DashboardPage = ({user}:UserProfileProps) => {
   return (
-    <ViewPageComponents><h1>DashboardPage</h1></ViewPageComponents>
+    <ViewPageComponents ><div className="p-10"><h1 className="text-sm font-medium">Welcome back, <span className="text-lg font-semibold"> {user.name}</span></h1></div></ViewPageComponents>
   )
 }
 

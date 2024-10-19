@@ -7,7 +7,7 @@ const upload = multer({ storage });
 export const userRoutes = Router();
 userRoutes.post("/register", register);
 userRoutes.post("/login", login);
-userRoutes.post("/refresh/token", generateAccessToken)
+userRoutes.get("/refresh/token", generateAccessToken)
 userRoutes.post("/logout", verifyAuth, logout)
 userRoutes.put("/update/me", verifyAuth, upload.single("profileImage"), updateUserDetails);
 userRoutes.get("/me", verifyAuth, getCurrentUser)

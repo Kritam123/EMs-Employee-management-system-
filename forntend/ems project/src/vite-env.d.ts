@@ -1,10 +1,13 @@
 /// <reference types="vite/client" />
 interface UserProfileProps {
     user:{
-        name:string,
-        role:string,
-        profile_img:string
-    }
+        id:string
+        firstName:string,
+        lastName:string,
+        profile_img:string,
+        organization:boolean
+    }| null
+    isLoading:boolean
     }
 
     interface SignUpProps {
@@ -12,6 +15,9 @@ interface UserProfileProps {
             firstName:string,
             lastName:string,
             email:string,
-            password:stringss
+            password:string,
         
+    }
+    interface CreateOrganization {
+        orgName:string
     }

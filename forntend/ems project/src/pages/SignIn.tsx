@@ -3,15 +3,48 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Link } from "react-router-dom";
+import { useMutation } from "@tanstack/react-query";
+import axios from "axios";
+import { Loader2 } from "lucide-react";
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 
 const SignIn = () => {
+  const navigate = useNavigate();
+  const [email, setEmail] = useState('');
+  const [loading, setLoading] = useState<boolean>(false)
+  const [password, setPassword] = useState('');
+
+  const mutation = useMutation({
+    mutationFn: ({ email, password }: { email: string, password: string }) =>
+      axios.post('http://localhost:8000/api/v1/user/login', { email, password }, {
+        withCredentials: true, // Allow cookies to be set
+      }),
+    onSuccess: (data) => {
+      console.log('Login successful:', data);
+      alert('You are logged in!');
+      setLoading(false);
+      navigate("/", { replace: true })
+      // Perform additional tasks like fetching user data here
+    },
+    onError: (error) => {
+      console.error('Login failed:', error);
+      alert('Invalid credentials!');
+      setLoading(false);
+    },
+  });
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+
+    setLoading(true);
+    e.preventDefault();
+    mutation.mutate({ email, password }); // Trigger the API call
+  };
   return (
     <div className="h-[calc(100vh-1rem)]  flex mt-3 items-center justify-center bg-gray-100">
       <div className="w-full max-w-md bg-white rounded-lg shadow-lg p-8">
         <h2 className="text-3xl font-bold text-center text-indigo-600 mb-8">Login to EMS</h2>
         {/* Login Form */}
-        <form onSubmit={(e) => e.preventDefault()} className="space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-6">
           {/* Email Input */}
           <div>
             <Label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
@@ -20,7 +53,8 @@ const SignIn = () => {
             <Input
               type="email"
               id="email"
-              name="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"
               placeholder="Enter your email"
               required
@@ -35,7 +69,8 @@ const SignIn = () => {
             <Input
               type="password"
               id="password"
-              name="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"
               placeholder="Enter your password"
               required
@@ -54,7 +89,14 @@ const SignIn = () => {
             type="submit"
             className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-lg transition"
           >
-            Login
+            {
+              loading ?
+                <Loader2 className="w-4 h-4 animate-spin" />
+                :
+                <span>
+                  Sign In
+                </span>
+            }
           </Button>
         </form>
 

@@ -75,14 +75,11 @@ const login = catchAsyncError(async (req: Request, res: Response, next: NextFunc
                 refreshToken
             }
         });
-        return res.status(200).cookie("accessToken", accessToken, {
-            maxAge: 180000,
+        const options = {
             httpOnly: true,
-            // secure:true
-        }).cookie("refreshToken", refreshToken, {
-            maxAge: 432000000,
-            httpOnly: true,
-        }).json(new ApiResponse(200, {}, "User Logged In"));
+            secure: false,
+        }
+        return res.status(200).cookie("accessToken", accessToken, options).cookie("refreshToken", refreshToken, options).json(new ApiResponse(200, {}, "User Logged In"));
     } catch (error) {
         console.log(error)
         return res.status(500).json(new ApiError(500, "Internal Server Error"))
@@ -99,7 +96,7 @@ const generateAccessToken = catchAsyncError(async (req: Request, res: Response) 
         if (!refreshToken) {
             return res.status(401).json(new ApiError(401, "Token Invalid!"));
         }
-        const decodedToken = jwt.verify(refreshToken, process.env.REFRESHTOKEN_SECRET!)
+        const decodedToken = jwt.verify(accessToken, process.env.ACCESSTOKEN_SECRET!)
         if (!decodedToken) {
             return res.status(401).json(new ApiError(400, "Session Expired!"));
         }
@@ -262,4 +259,4 @@ const changeCurrentPassword = catchAsyncError(async (req: Request, res: Response
         .json(new ApiResponse(200, {}, "Password changed successfully"))
 })
 
-export { register, login, generateAccessToken, updateUserDetails, logout, getCurrentUser,changeCurrentPassword }
+export { register, login, generateAccessToken, updateUserDetails, logout, getCurrentUser, changeCurrentPassword }

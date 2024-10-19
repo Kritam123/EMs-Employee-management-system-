@@ -6,11 +6,11 @@ import Navbar from "@/components/HomeSection/Navbar"
 import Services from "@/components/HomeSection/Services"
 import Testimonials from "@/components/HomeSection/Testimonials"
 
-const HomePage = ({user}:UserProfileProps) => {
+const HomePage = ({user,isLoading}:UserProfileProps) => {
   return (
     <>
       {/* navbar */}
-      <Navbar user={user}/>
+      <Navbar isLoading={isLoading} user={user}/>
 {/* hero section */}
     <HeroSection/>
     {/* Services */}

@@ -15,13 +15,13 @@ dotenv.config({})
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }))
 app.use(cors({
-    origin: "*",
-    credentials: true,
-    methods: ["POST", "GET", "PATCH", "PUT"]
-}));
+    origin: ['http://localhost:5173'],
+    optionsSuccessStatus: 200,
+    credentials:true
+  }));
+app.use(cookieParser());
 app.use(morgan("dev"));
 app.use(helmet({ xssFilter: true }));
-app.use(cookieParser());
 app.get("/", (req: Request, res: Response) => {
     res.send("Hello");
 });

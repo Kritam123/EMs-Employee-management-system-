@@ -1,5 +1,6 @@
 import { Router } from "express";
-import { createOrg, memberInvitation } from "../controllers/org_controllers";
+import { createOrg, getOrgById, memberInvitation,getAllOrgGetByUser } from "../controllers/org_controllers";
+import { verifyAuth } from "../middlewares/verifyAuth";
 
 export const orgRoutes = Router();
 
@@ -11,8 +12,10 @@ export const orgRoutes = Router();
 // delete data of any employee
 // update employess details i.e salary , attendce everyday,agrement reminder or expiery
 
-orgRoutes.post("/create",createOrg);
-orgRoutes.put("/memberInviteCode/:memberInviteCode",memberInvitation);
+orgRoutes.post("/create",verifyAuth,createOrg);
+orgRoutes.get("/:orgId",verifyAuth,getOrgById);
+orgRoutes.get("/user/getOrg/all",verifyAuth,getAllOrgGetByUser)
+orgRoutes.get("/memberInviteCode/:memberInviteCode",verifyAuth,memberInvitation);
 
 
 

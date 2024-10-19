@@ -4,66 +4,110 @@ import { ApiResponse } from "../utils/ApiResponse";
 import { ApiError } from "../utils/ApiError";
 import { prisma } from "../dbConnect/db";
 import { Role } from "@prisma/client";
-import { v4 as uuidv4} from "uuid"
- const createOrg = catchAsyncError(async(req:Request,res:Response,next:NextFunction)=>{
+import { v4 as uuidv4 } from "uuid"
+const createOrg = catchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const {orgName,employeeId} = req.body;
-        if(!orgName) {
-            return res.status(400).json(new ApiError(400,"Organization Name is Missing!"))
+        const currEmployeeId = req.user.id;
+        const { orgName } = req.body;
+        if (!orgName) {
+            return res.status(400).json(new ApiError(400, "Organization Name is Missing!"))
         }
         const createOrg = await prisma.organization.create({
-            data:{
+            data: {
                 orgName,
-                createdId:employeeId,
-                memberInviteCode:uuidv4(),
+                createdId: currEmployeeId,
+                memberInviteCode: uuidv4(),
                 orgMembers:
                 {
-                    create:[{employeeId,role:Role.ADMIN}]
+                    create: [{ employeeId: currEmployeeId, role: Role.ADMIN }]
                 }
             },
-            
+
         });
-        return res.status(201).json( new ApiResponse(201,{createOrg},"Organization Created"));
+        return res.status(201).json(new ApiResponse(201, { createOrg }, "Organization Created"));
     } catch (error) {
-        return res.status(500).json(new ApiResponse(500,"Internal Server Error"))
+        return res.status(500).json(new ApiResponse(500, "Internal Server Error"))
     }
 });
 
-const memberInvitation = catchAsyncError(async(req:Request,res:Response)=>{
+const memberInvitation = catchAsyncError(async (req: Request, res: Response) => {
     try {
-        const {employeeId,currentUserId} = req.body; 
-        const {memberInviteCode} = req.params;
-        if(!memberInviteCode) {
-            return res.status(400).json(new ApiError(400,"MemberInviteCode is Missing"));
+        const employeeId = req?.user?.id;
+        const { memberInviteCode } = req.params;
+        if (!memberInviteCode) {
+            return res.status(400).json(new ApiError(400, "MemberInviteCode is Missing"));
         }
-        const isUserExistsInOrg = await prisma.organization.findFirst({
-            where:{
-                memberInviteCode,
-                orgMembers:{
-                    some:{
+        let org;
+        org = await prisma.organization.findFirst({
+            where: {
+                memberInviteCode:memberInviteCode,
+                orgMembers: {
+                    some: {
                         employeeId
                     }
                 }
             }
         })
-        if(isUserExistsInOrg) {
-            return res.status(400).json(new ApiError(400,"User Already Exists in Organozation"));
+        if (org) {
+            return res.status(200).json(new ApiResponse(200, { org }, "Updated OrgMember"));
         }
-        const updateOrg = await prisma.organization.update({
-            where:{
-                createdId:currentUserId,
+        org = await prisma.organization.update({
+            where: {
                 memberInviteCode
             },
-            data:{
-                orgMembers:{
-                    create:[{employeeId}]
+            data: {
+                orgMembers: {
+                    create: [{ employeeId }]
                 }
             }
         })
-        return res.status(201).json(new ApiResponse(201,{updateOrg},"Updated OrgMember"))
+        return res.status(201).json(new ApiResponse(201, { org }, "Updated OrgMember"))
     } catch (error) {
         console.log(error)
-        return res.status(500).json(new ApiResponse(500,"Internal Server Error"))
+        return res.status(500).json(new ApiResponse(500, "Internal Server Error"))
     }
 })
-export {createOrg,memberInvitation}
+const getOrgById = catchAsyncError(async (req: Request, res: Response) => {
+    try {
+        // const currEmployeeId = req.user.id;
+        const { orgId } = req.params;
+        const org = await prisma.organization.findUnique({
+            where: {
+                id: orgId
+            },
+            include: {
+                orgMembers: true
+            }
+        })
+        if (!org) {
+            return res.status(404).json(new ApiError(404, "Org not found!"))
+        }
+        return res.status(200).json({ org })
+    } catch (error) {
+        console.log(error)
+        return res.status(500).json(new ApiResponse(500, "Internal Server Error"))
+    }
+})
+const getAllOrgGetByUser = catchAsyncError(async(req:Request,res:Response)=>{
+    try {
+        const employeeId = req.user.id
+          const allOrg = await prisma.organization.findMany({
+              where: {
+                 orgMembers:{
+                    some:{
+                        employeeId
+                    }
+                 } 
+              },
+             
+          })
+          if (!allOrg) {
+              return res.status(404).json(new ApiError(404, "Org not found!"))
+          }
+          return res.status(200).json({ allOrg })
+    } catch (error) {
+        console.log(error)
+        return res.status(500).json(new ApiResponse(500, "Internal Server Error"))
+    }
+})
+export { createOrg, memberInvitation, getOrgById,getAllOrgGetByUser }

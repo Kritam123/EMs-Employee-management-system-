@@ -16,7 +16,8 @@ interface DecodedToken extends JwtPayload {
     id: string; 
 }
 const verifyAuth = catchAsyncError(async(req:Request,res:Response,next:NextFunction)=>{
-   const token = req.cookies.accessToken;
+   const token = req.cookies?.accessToken;
+   console.log(token);
    if(!token) {
     return res.status(401).json(new ApiError(401,"Unauthorized Access!"));
    }

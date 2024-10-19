@@ -6,34 +6,34 @@ import { cn } from '@/lib/utils'
 
 
 const RoutesLink = () => {
-    const {id} = useParams();
+    const {orgId} = useParams();
     const  employeeLinks = [
         {
-            href:`/organization/${id}/dashboard` ,
+            href:`/organization/${orgId}/dashboard` ,
             label:"Dashboard",
             icon:LucideLayoutDashboard
         },
         {   
-            href:`/organization/${id}/schedule`,
+            href:`/organization/${orgId}/schedule`,
             label:"Schedule",
             icon:CalendarCheck
         },
         {
-            href:`/organization/${id}/calender`,
+            href:`/organization/${orgId}/calender`,
             label:"Calendar",icon:CalendarDays
     
         },{
-            href:`/organization/${id}/salaries`,
+            href:`/organization/${orgId}/salaries`,
             label:"Salaries",
             icon:BadgeDollarSign
         },
         {
-            href:`/organization/${id}/messages`,
+            href:`/organization/${orgId}/messages`,
             label:"Messages",
             icon:MessageCircleMore
         },
         {
-            href:`/organization/${id}/contract`,
+            href:`/organization/${orgId}/contract`,
             label:"Contract Remainder",
             icon:ReceiptText
         }

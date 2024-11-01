@@ -21,7 +21,7 @@ const OrganizationList = () => {
   if(!data && !isLoading) {
     return <div>
       <h1>No data found!</h1>
-    </div>;
+    </div>
   }
   console.log(data.allOrg)
   return (
@@ -39,14 +39,11 @@ const OrganizationList = () => {
             {org.name}
           </Button>
           </Link>
-         
 )
-
 })
       }
        </ScrollArea>
     </div>
   )
 }
-
 export default OrganizationList
